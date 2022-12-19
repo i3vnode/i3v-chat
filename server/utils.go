@@ -18,10 +18,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/tinode/chat/server/auth"
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -104,8 +104,9 @@ func normalizeTags(src []string) types.StringSlice {
 }
 
 // stringDelta extracts the slices of added and removed strings from two slices:
-//   added :=  newSlice - (oldSlice & newSlice) -- present in new but missing in old
-//   removed := oldSlice - (oldSlice & newSlice) -- present in old but missing in new
+//
+//	added :=  newSlice - (oldSlice & newSlice) -- present in new but missing in old
+//	removed := oldSlice - (oldSlice & newSlice) -- present in old but missing in new
 func stringSliceDelta(rold, rnew []string) (added, removed []string) {
 	if len(rold) == 0 && len(rnew) == 0 {
 		return nil, nil
@@ -356,7 +357,9 @@ func parseVersionPart(vers string) int {
 }
 
 // Parses semantic version string in the following formats:
-//  1.2, 1.2abc, 1.2.3, 1.2.3-abc, v0.12.34-rc5
+//
+//	1.2, 1.2abc, 1.2.3, 1.2.3-abc, v0.12.34-rc5
+//
 // Unparceable values are replaced with zeros.
 func parseVersion(vers string) int {
 	var major, minor, patch int

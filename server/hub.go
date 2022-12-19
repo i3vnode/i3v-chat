@@ -14,10 +14,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tinode/chat/server/auth"
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 // RequestLatencyDistribution is an array of request latency distribution bounds (in milliseconds).
@@ -383,7 +383,6 @@ func (h *Hub) topicsStateForUser(uid types.Uid, suspended bool) {
 
 // 2. Topic is just being unregistered (topic is going offline)
 // 2.1 Unregister it with no further action
-//
 func (h *Hub) topicUnreg(sess *Session, topic string, msg *ClientComMessage, reason int) error {
 	now := types.TimeNow()
 

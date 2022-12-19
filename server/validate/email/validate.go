@@ -20,9 +20,9 @@ import (
 	"strings"
 	textt "text/template"
 
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	t "github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	t "github.com/i3vnode/i3v-chat/server/store/types"
 	i18n "golang.org/x/text/language"
 )
 
@@ -480,7 +480,6 @@ func (v *validator) Remove(user t.Uid, value string) error {
 }
 
 // SendMail replacement
-//
 func (v *validator) sendMail(rcpt []string, msg []byte) error {
 
 	client, err := smtp.Dial(v.SMTPAddr + ":" + v.SMTPPort)

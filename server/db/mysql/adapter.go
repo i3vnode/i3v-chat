@@ -16,11 +16,11 @@ import (
 	"time"
 
 	ms "github.com/go-sql-driver/mysql"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/db/common"
+	"github.com/i3vnode/i3v-chat/server/store"
+	t "github.com/i3vnode/i3v-chat/server/store/types"
 	"github.com/jmoiron/sqlx"
-	"github.com/tinode/chat/server/auth"
-	"github.com/tinode/chat/server/db/common"
-	"github.com/tinode/chat/server/store"
-	t "github.com/tinode/chat/server/store/types"
 )
 
 // adapter holds MySQL connection data.
@@ -820,7 +820,7 @@ func (a *adapter) UserCreate(user *t.User) error {
 	}()
 
 	user_uuid := store.GetNewUUid()
-	fmt.Printf("UUIDv4: %s\n", u1)
+	fmt.Printf("UUIDv4: %s\n", user_uuid)
 	//fmt.Println("newUUID: ", strings.Replace(u1, "-", "", -1))
 
 	decoded_uid := store.DecodeUid(user.Uid())

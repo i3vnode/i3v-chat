@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 // Level is the type for authentication levels.

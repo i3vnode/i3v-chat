@@ -11,12 +11,12 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/push"
-	"github.com/tinode/chat/server/push/common"
-	"github.com/tinode/chat/server/push/fcm"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/push"
+	"github.com/i3vnode/i3v-chat/server/push/common"
+	"github.com/i3vnode/i3v-chat/server/push/fcm"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 
 	fcmv1 "google.golang.org/api/fcm/v1"
 )

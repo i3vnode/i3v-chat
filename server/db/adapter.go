@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/tinode/chat/server/auth"
-	t "github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	t "github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 // Adapter is the interface that must be implemented by a database

@@ -29,7 +29,7 @@ IM: Instant Messanger
 
 * [API 설명서](docs/API.md) 및 [FAQ](docs/faq.md)를 읽으십시오.
 * 지원, 일반적인 질문, 토로은[https://groups.google.com/d/forum/tinode](https://groups.google.com/d/forum/tinode).에 게시하십시오.
-* 버그 및 기능 요청에 대해서는 [issue](https://github.com/tinode/chat/issues/new)를 여십시오.
+* 버그 및 기능 요청에 대해서는 [issue](https://github.com/i3vnode/i3v-chat/issues/new)를 여십시오.
 
 
 ## 공공서비스

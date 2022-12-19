@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tinode/chat/server/auth"
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 // authenticator is the type to map authentication methods to.

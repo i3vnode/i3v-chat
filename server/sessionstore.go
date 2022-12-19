@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tinode/chat/pbx"
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/pbx"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 // SessionStore holds live sessions. Long polling sessions are stored in a linked list with
@@ -203,8 +203,8 @@ func (ss *SessionStore) EvictUser(uid types.Uid, skipSid string) {
 }
 
 // NodeRestarted removes stale sessions from a restarted cluster node.
-//  - nodeName is the name of affected node
-//  - fingerprint is the new fingerprint of the node.
+//   - nodeName is the name of affected node
+//   - fingerprint is the new fingerprint of the node.
 func (ss *SessionStore) NodeRestarted(nodeName string, fingerprint int64) {
 	ss.lock.Lock()
 	defer ss.lock.Unlock()

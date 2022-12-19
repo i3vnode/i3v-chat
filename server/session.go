@@ -20,11 +20,11 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/tinode/chat/pbx"
-	"github.com/tinode/chat/server/auth"
-	"github.com/tinode/chat/server/logs"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/pbx"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 
 	"golang.org/x/text/language"
 )
@@ -1261,9 +1261,10 @@ func (s *Session) note(msg *ClientComMessage) {
 
 // expandTopicName expands session specific topic name to global name
 // Returns
-//   topic: session-specific topic name the message recipient should see
-//   routeTo: routable global topic name
-//   err: *ServerComMessage with an error to return to the sender
+//
+//	topic: session-specific topic name the message recipient should see
+//	routeTo: routable global topic name
+//	err: *ServerComMessage with an error to return to the sender
 func (s *Session) expandTopicName(msg *ClientComMessage) (string, *ServerComMessage) {
 	if msg.Original == "" {
 		logs.Warn.Println("s.etn: empty topic name", s.sid)

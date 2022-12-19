@@ -14,11 +14,13 @@ import (
 	"crypto/md5"
 	"encoding/base64"
 
-	"github.com/tinode/chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/logs"
 )
 
 // Singned AppID. Composition:
-//   [1:algorithm version][4:appid][2:key sequence][1:isRoot][16:signature] = 24 bytes
+//
+//	[1:algorithm version][4:appid][2:key sequence][1:isRoot][16:signature] = 24 bytes
+//
 // convertible to base64 without padding. All integers are little-endian.
 // Definitions for byte lengths of key's parts.
 const (
@@ -37,7 +39,9 @@ const (
 )
 
 // Client signature validation
-//   key: client's secret key
+//
+//	key: client's secret key
+//
 // Returns application id, key type.
 func checkAPIKey(apikey string) (isValid, isRoot bool) {
 	if declen := base64.URLEncoding.DecodedLen(len(apikey)); declen != apikeyLength {

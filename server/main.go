@@ -27,35 +27,35 @@ import (
 	jcr "github.com/tinode/jsonco"
 
 	// Authenticators
-	"github.com/tinode/chat/server/auth"
-	_ "github.com/tinode/chat/server/auth/anon"
-	_ "github.com/tinode/chat/server/auth/basic"
-	_ "github.com/tinode/chat/server/auth/rest"
-	_ "github.com/tinode/chat/server/auth/token"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	_ "github.com/i3vnode/i3v-chat/server/auth/anon"
+	_ "github.com/i3vnode/i3v-chat/server/auth/basic"
+	_ "github.com/i3vnode/i3v-chat/server/auth/rest"
+	_ "github.com/i3vnode/i3v-chat/server/auth/token"
 
 	// Database backends
-	_ "github.com/tinode/chat/server/db/mongodb"
-	_ "github.com/tinode/chat/server/db/mysql"
-	_ "github.com/tinode/chat/server/db/rethinkdb"
+	_ "github.com/i3vnode/i3v-chat/server/db/mongodb"
+	_ "github.com/i3vnode/i3v-chat/server/db/mysql"
+	_ "github.com/i3vnode/i3v-chat/server/db/rethinkdb"
 
-	"github.com/tinode/chat/server/logs"
+	"github.com/i3vnode/i3v-chat/server/logs"
 
 	// Push notifications
-	"github.com/tinode/chat/server/push"
-	_ "github.com/tinode/chat/server/push/fcm"
-	_ "github.com/tinode/chat/server/push/stdout"
-	_ "github.com/tinode/chat/server/push/tnpg"
+	"github.com/i3vnode/i3v-chat/server/push"
+	_ "github.com/i3vnode/i3v-chat/server/push/fcm"
+	_ "github.com/i3vnode/i3v-chat/server/push/stdout"
+	_ "github.com/i3vnode/i3v-chat/server/push/tnpg"
 
-	"github.com/tinode/chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store"
 
 	// Credential validators
-	_ "github.com/tinode/chat/server/validate/email"
-	_ "github.com/tinode/chat/server/validate/tel"
+	_ "github.com/i3vnode/i3v-chat/server/validate/email"
+	_ "github.com/i3vnode/i3v-chat/server/validate/tel"
 	"google.golang.org/grpc"
 
 	// File upload handlers
-	_ "github.com/tinode/chat/server/media/fs"
-	_ "github.com/tinode/chat/server/media/s3"
+	_ "github.com/i3vnode/i3v-chat/server/media/fs"
+	_ "github.com/i3vnode/i3v-chat/server/media/s3"
 )
 
 const (
@@ -110,13 +110,18 @@ const (
 )
 
 // Build version number defined by the compiler:
-// 		-ldflags "-X main.buildstamp=value_to_assign_to_buildstamp"
+//
+//	-ldflags "-X main.buildstamp=value_to_assign_to_buildstamp"
+//
 // Reported to clients in response to {hi} message.
 // For instance, to define the buildstamp as a timestamp of when the server was built add a
 // flag to compiler command line:
-// 		-ldflags "-X main.buildstamp=`date -u '+%Y%m%dT%H:%M:%SZ'`"
+//
+//	-ldflags "-X main.buildstamp=`date -u '+%Y%m%dT%H:%M:%SZ'`"
+//
 // or to set it to git tag:
-// 		-ldflags "-X main.buildstamp=`git describe --tags`"
+//
+//	-ldflags "-X main.buildstamp=`git describe --tags`"
 var buildstamp = "undef"
 
 // CredValidator holds additional config params for a credential validator.

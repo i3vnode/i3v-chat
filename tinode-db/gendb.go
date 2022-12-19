@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/tinode/chat/server/auth"
-	_ "github.com/tinode/chat/server/auth/basic"
-	"github.com/tinode/chat/server/store"
-	"github.com/tinode/chat/server/store/types"
+	"github.com/i3vnode/i3v-chat/server/auth"
+	_ "github.com/i3vnode/i3v-chat/server/auth/basic"
+	"github.com/i3vnode/i3v-chat/server/store"
+	"github.com/i3vnode/i3v-chat/server/store/types"
 )
 
 func genDb(data *Data) {

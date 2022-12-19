@@ -6,7 +6,7 @@ import (
 	"hash/fnv"
 	"testing"
 
-	"github.com/tinode/chat/server/ringhash"
+	"github.com/i3vnode/i3v-chat/server/ringhash"
 )
 
 func TestHashing(t *testing.T) {
