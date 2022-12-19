@@ -52,6 +52,17 @@ CREATE TABLE usertags(
 	UNIQUE INDEX usertags_userid_tag(userid, tag)
 );
 
+CREATE TABLE friends(
+	id 			INT NOT NULL AUTO_INCREMENT,
+	userid 		BIGINT NOT NULL,
+	useruuid	VARCHAR(36) NOT NULL DEFAULT '',
+	friendid	BIGINT NOT NULL,
+	frienduuid	VARCHAR(36) NOT NULL DEFAULT '',
+
+	PRIMARY KEY(id),
+	FOREIGN KEY(userid) REFERENCES users(id)
+)
+
 # Indexed devices. Normalized into a separate table.
 CREATE TABLE devices(
 	id 			INT NOT NULL AUTO_INCREMENT,
