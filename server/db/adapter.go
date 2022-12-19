@@ -79,9 +79,9 @@ type Adapter interface {
 	// AuthGetUniqueRecord returns authentication record for a given unique value i.e. login.
 	AuthGetUniqueRecord(unique string) (t.Uid, auth.Level, []byte, time.Time, error)
 	// AuthGetRecord returns authentication record given user ID and method.
-	AuthGetRecord(user t.Uid, scheme string) (string, auth.Level, []byte, time.Time, error)
+	AuthGetRecord(user t.Uid, scheme string) (string, t.UUid, auth.Level, []byte, time.Time, error)
 	// AuthAddRecord creates new authentication record
-	AuthAddRecord(user t.Uid, scheme, unique string, authLvl auth.Level, secret []byte, expires time.Time) error
+	AuthAddRecord(user t.Uid, uuid t.UUid, scheme, unique string, authLvl auth.Level, secret []byte, expires time.Time) error
 	// AuthDelScheme deletes an existing authentication scheme for the user.
 	AuthDelScheme(user t.Uid, scheme string) error
 	// AuthDelAllRecords deletes all records of a given user.

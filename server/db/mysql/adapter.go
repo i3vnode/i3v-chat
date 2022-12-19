@@ -9,7 +9,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"hash/fnv"
 	"strconv"
 	"strings"
@@ -349,6 +348,20 @@ func (a *adapter) CreateDb(reset bool) error {
 		return err
 	}
 
+	// Indexed friends tags.
+	if _, err = tx.Exec(
+		`CREATE TABLE friends(
+			id 			INT NOT NULL AUTO_INCREMENT,
+			userid 		BIGINT NOT NULL,
+			useruuid	VARCHAR(36) NOT NULL DEFAULT '',
+			friendid	BIGINT NOT NULL,
+			frienduuid	VARCHAR(36) NOT NULL DEFAULT '',
+			PRIMARY KEY(id),
+			FOREIGN KEY(userid) REFERENCES users(id)
+		)`); err != nil {
+		return err
+	}
+
 	// Indexed devices. Normalized into a separate table.
 	if _, err = tx.Exec(
 		`CREATE TABLE devices(
@@ -372,6 +385,7 @@ func (a *adapter) CreateDb(reset bool) error {
 			id      INT NOT NULL AUTO_INCREMENT,
 			uname   VARCHAR(32) NOT NULL,
 			userid  BIGINT NOT NULL,
+			useruuid VARCHAR(36) NOT NULL,
 			scheme  VARCHAR(16) NOT NULL,
 			authlvl INT NOT NULL,
 			secret  VARCHAR(255) NOT NULL,
@@ -819,14 +833,14 @@ func (a *adapter) UserCreate(user *t.User) error {
 		}
 	}()
 
-	user_uuid := store.GetNewUUid()
-	fmt.Printf("UUIDv4: %s\n", user_uuid)
+	// user_uuid := store.GetNewUUid()
+	// fmt.Printf("UUIDv4: %s\n", user_uuid)
 	//fmt.Println("newUUID: ", strings.Replace(u1, "-", "", -1))
 
 	decoded_uid := store.DecodeUid(user.Uid())
-	if _, err = tx.Exec("INSERT INTO users(id,useruuid,createdat,updatedat,state,access,public,trusted,tags) VALUES(?,?,?,?,?,?,?,?)",
+	if _, err = tx.Exec("INSERT INTO users(id,useruuid,createdat,updatedat,state,access,public,trusted,tags) VALUES(?,?,?,?,?,?,?,?,?)",
 		decoded_uid,
-		user_uuid,
+		user.Useruuid,
 		user.CreatedAt, user.UpdatedAt,
 		user.State, user.Access,
 		toJSON(user.Public), toJSON(user.Trusted), user.Tags); err != nil {
@@ -842,7 +856,7 @@ func (a *adapter) UserCreate(user *t.User) error {
 }
 
 // Add user's authentication record
-func (a *adapter) AuthAddRecord(uid t.Uid, scheme, unique string, authLvl auth.Level,
+func (a *adapter) AuthAddRecord(uid t.Uid, uuid t.UUid, scheme, unique string, authLvl auth.Level,
 	secret []byte, expires time.Time) error {
 
 	var exp *time.Time
@@ -853,8 +867,8 @@ func (a *adapter) AuthAddRecord(uid t.Uid, scheme, unique string, authLvl auth.L
 	if cancel != nil {
 		defer cancel()
 	}
-	_, err := a.db.ExecContext(ctx, "INSERT INTO auth(uname,userid,scheme,authLvl,secret,expires) VALUES(?,?,?,?,?,?)",
-		unique, store.DecodeUid(uid), scheme, authLvl, secret, exp)
+	_, err := a.db.ExecContext(ctx, "INSERT INTO auth(uname,userid,useruuid, scheme,authLvl,secret,expires) VALUES(?,?,?,?,?,?,?)",
+		unique, store.DecodeUid(uid), uuid, scheme, authLvl, secret, exp)
 	if err != nil {
 		if isDupe(err) {
 			return t.ErrDuplicate
@@ -933,6 +947,7 @@ func (a *adapter) AuthGetRecord(uid t.Uid, scheme string) (string, auth.Level, [
 
 	var record struct {
 		Uname   string
+		useruuid t.UUid
 		Authlvl auth.Level
 		Secret  []byte
 		Expires *time.Time
@@ -942,7 +957,7 @@ func (a *adapter) AuthGetRecord(uid t.Uid, scheme string) (string, auth.Level, [
 	if cancel != nil {
 		defer cancel()
 	}
-	if err := a.db.GetContext(ctx, &record, "SELECT uname,secret,expires,authlvl FROM auth WHERE userid=? AND scheme=?",
+	if err := a.db.GetContext(ctx, &record, "SELECT uname,useruuid,secret,expires,authlvl FROM auth WHERE userid=? AND scheme=?",
 		store.DecodeUid(uid), scheme); err != nil {
 		if err == sql.ErrNoRows {
 			// Nothing found - use standard error.
@@ -998,6 +1013,7 @@ func (a *adapter) UserGet(uid t.Uid) (*t.User, error) {
 	err := a.db.GetContext(ctx, &user, "SELECT * FROM users WHERE id=? AND state!=?", store.DecodeUid(uid), t.StateDeleted)
 	if err == nil {
 		user.SetUid(uid)
+		// user.SetUUid(user.Useruuid)
 		user.Public = fromJSON(user.Public)
 		user.Trusted = fromJSON(user.Trusted)
 		return &user, nil

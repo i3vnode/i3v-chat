@@ -207,7 +207,8 @@ func (d *Duration) UnmarshalJSON(b []byte) error {
 // Rec is an authentication record.
 type Rec struct {
 	// User ID.
-	Uid types.Uid `json:"uid,omitempty"`
+	Uid  types.Uid  `json:"uid,omitempty"`
+	UUid types.UUid `json:"uuid,omitempty"`
 	// Authentication level.
 	AuthLevel Level `json:"authlvl,omitempty"`
 	// Lifetime of this record.

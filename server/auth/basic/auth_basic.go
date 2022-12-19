@@ -139,7 +139,7 @@ func (a *authenticator) AddRecord(rec *auth.Rec, secret []byte, remoteAddr strin
 		authLevel = auth.LevelAuth
 	}
 
-	err = store.Users.AddAuthRecord(rec.Uid, authLevel, a.name, uname, passhash, expires)
+	err = store.Users.AddAuthRecord(rec.Uid, rec.UUid, authLevel, a.name, uname, passhash, expires)
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (a *authenticator) UpdateRecord(rec *auth.Rec, secret []byte, remoteAddr st
 		return nil, err
 	}
 
-	login, authLevel, _, _, err := store.Users.GetAuthRecord(rec.Uid, a.name)
+	login, _, authLevel, _, _, err := store.Users.GetAuthRecord(rec.Uid, a.name)
 	if err != nil {
 		return nil, err
 	}
@@ -306,7 +306,7 @@ func (a *authenticator) RestrictedTags() ([]string, error) {
 
 // GetResetParams returns authenticator parameters passed to password reset handler.
 func (a *authenticator) GetResetParams(uid types.Uid) (map[string]interface{}, error) {
-	login, _, _, _, err := store.Users.GetAuthRecord(uid, a.name)
+	login, _, _, _, _, err := store.Users.GetAuthRecord(uid, a.name)
 	if err != nil {
 		return nil, err
 	}

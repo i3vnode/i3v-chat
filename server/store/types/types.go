@@ -56,6 +56,8 @@ const (
 // Uid is a database-specific record id, suitable to be used as a primary key.
 type Uid uint64
 
+type UUid string
+
 // ZeroUid is a constant representing uninitialized Uid.
 const ZeroUid Uid = 0
 
@@ -349,6 +351,7 @@ type ObjHeader struct {
 	// `bson:"_id"` tag is for mongodb to use as primary key '_id'.
 	Id        string `bson:"_id"`
 	id        Uid
+	uuid      UUid
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
@@ -365,6 +368,16 @@ func (h *ObjHeader) Uid() Uid {
 func (h *ObjHeader) SetUid(uid Uid) {
 	h.id = uid
 	h.Id = uid.String()
+}
+
+// SetUid assigns given Uid to appropriate header fields.
+func (h *ObjHeader) SetUUid(uuid UUid) {
+	h.uuid = uuid
+}
+
+// Uid assigns Uid header field.
+func (h *ObjHeader) UUid() UUid {
+	return h.uuid
 }
 
 // TimeNow returns current wall time in UTC rounded to milliseconds.
@@ -507,6 +520,7 @@ type User struct {
 	LastSeen *time.Time
 	// User agent provided when accessing the topic last time
 	UserAgent string
+	Useruuid  UUid
 
 	Public  interface{}
 	Trusted interface{}

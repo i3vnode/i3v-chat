@@ -133,7 +133,8 @@ func replyCreateUser(s *Session, msg *ClientComMessage, rec *auth.Rec) {
 	}
 
 	// Add authentication record. The authhdl.AddRecord may change tags.
-	rec, err := authhdl.AddRecord(&auth.Rec{Uid: user.Uid(), Tags: user.Tags}, msg.Acc.Secret, s.remoteAddr)
+	logs.Warn.Println("create user: add auth record UUid:", user.Useruuid)
+	rec, err := authhdl.AddRecord(&auth.Rec{Uid: user.Uid(), UUid: user.Useruuid, Tags: user.Tags}, msg.Acc.Secret, s.remoteAddr)
 	if err != nil {
 		logs.Warn.Println("create user: add auth record failed", err, s.sid)
 		// Attempt to delete incomplete user record

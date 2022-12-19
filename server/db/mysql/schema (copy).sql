@@ -21,12 +21,12 @@ CREATE TABLE kvmeta(
 	PRIMARY KEY(`key`)
 );
 
-INSERT INTO kvmeta(`key`, `value`) VALUES("version", "112");
+INSERT INTO kvmeta(`key`, `value`) VALUES("version", "100");
 
 CREATE TABLE users(
 	id 			BIGINT NOT NULL,
-	createdat 	DATETIME(3) NOT NULL,
 	useruuid	VARCHAR(36) NOT NULL DEFAULT '',
+	createdat 	DATETIME(3) NOT NULL,
 	updatedat 	DATETIME(3) NOT NULL,
 	state 		SMALLINT NOT NULL DEFAULT 0,
 	stateat 	DATETIME(3),
@@ -34,7 +34,6 @@ CREATE TABLE users(
 	lastseen 	DATETIME,
 	useragent 	VARCHAR(255) DEFAULT '',
 	public 		JSON,
-	trusted     JSON,
 	tags		JSON, -- Denormalized array of tags
 	
 	PRIMARY KEY(id),
@@ -84,9 +83,8 @@ CREATE TABLE auth(
 	id 		INT NOT NULL AUTO_INCREMENT,
 	uname	VARCHAR(32) NOT NULL,
 	userid 	BIGINT NOT NULL,
-	useruuid VARCHAR(36) NOT NULL,
 	scheme	VARCHAR(16) NOT NULL,
-	authlvl	INT NOT NULL,
+	authlvl	SMALLINT NOT NULL,
 	secret 	VARCHAR(255) NOT NULL,
 	expires DATETIME,
 	
@@ -102,9 +100,9 @@ CREATE TABLE topics(
 	id			INT NOT NULL AUTO_INCREMENT,
 	createdat 	DATETIME(3) NOT NULL,
 	updatedat 	DATETIME(3) NOT NULL,
+	touchedat 	DATETIME(3),
 	state		SMALLINT NOT NULL DEFAULT 0,
 	stateat		DATETIME(3),
-	touchedat 	DATETIME(3),
 	name		CHAR(25) NOT NULL,
 	usebt		TINYINT DEFAULT 0,
 	owner		BIGINT NOT NULL DEFAULT 0,
@@ -112,7 +110,6 @@ CREATE TABLE topics(
 	seqid		INT NOT NULL DEFAULT 0,
 	delid		INT DEFAULT 0,
 	public		JSON,
-	trusted     JSON,
 	tags		JSON, -- Denormalized array of tags
 	
 	PRIMARY KEY(id),
@@ -208,7 +205,7 @@ CREATE TABLE credentials(
 		
 	PRIMARY KEY(id),
 	UNIQUE credentials_uniqueness(synthetic),
-	FOREIGN KEY(userid) REFERENCES users(id)
+	FOREIGN KEY(userid) REFERENCES users(id),
 );
 
 # Records of uploaded files. Files themselves are stored elsewhere.
@@ -238,6 +235,8 @@ CREATE TABLE filemsglinks(
 	PRIMARY KEY(id),
 	FOREIGN KEY(fileid) REFERENCES fileuploads(id) ON DELETE CASCADE,
 	FOREIGN KEY(msgid) REFERENCES messages(id) ON DELETE CASCADE,
-	FOREIGN KEY(topic) REFERENCES topics(name) ON DELETE CASCADE,
+	FOREIGN KEY(topic) REFERENCES topics(name),
 	FOREIGN KEY(userid) REFERENCES users(id) ON DELETE CASCADE
 );
+
+	#FOREIGN KEY(topicid) REFERENCES topics(id) ON DELETE CASCADE,
