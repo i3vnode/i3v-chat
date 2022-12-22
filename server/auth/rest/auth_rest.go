@@ -232,6 +232,10 @@ func (a *authenticator) Authenticate(secret []byte, remoteAddr string) (*auth.Re
 	return resp.Record, resp.ByteVal, nil
 }
 
+func (a *authenticator) AuthenticateToken(secret []byte,  remoteAddr string) (*auth.Rec, []byte, error) {
+	return nil, nil, types.ErrNotFound
+}
+
 // AsTag converts search token into prefixed tag or an empty string if it
 // cannot be represented as a prefixed tag.
 func (a *authenticator) AsTag(token string) string {

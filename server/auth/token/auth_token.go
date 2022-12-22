@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/i3vnode/i3v-chat/server/auth"
+	"github.com/i3vnode/i3v-chat/server/logs"
 	"github.com/i3vnode/i3v-chat/server/store"
 	"github.com/i3vnode/i3v-chat/server/store/types"
 )
@@ -93,6 +94,7 @@ func (authenticator) UpdateRecord(rec *auth.Rec, secret []byte, remoteAddr strin
 
 // Authenticate checks validity of provided token.
 func (ta *authenticator) Authenticate(token []byte, remoteAddr string) (*auth.Rec, []byte, error) {
+	logs.Info.Println("login token Authenticate log. secret:" + string(token))
 	var tl tokenLayout
 	dataSize := binary.Size(&tl)
 	if len(token) < dataSize+sha256.Size {
@@ -138,6 +140,10 @@ func (ta *authenticator) Authenticate(token []byte, remoteAddr string) (*auth.Re
 		Lifetime:  auth.Duration(time.Until(expires)),
 		Features:  auth.Feature(tl.Features),
 		State:     types.StateUndefined}, nil, nil
+}
+
+func (ta *authenticator) AuthenticateToken(secret []byte, remoteAddr string) (*auth.Rec, []byte, error) {
+	return nil, nil, types.ErrFailed
 }
 
 // GenSecret generates a new token.

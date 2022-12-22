@@ -88,6 +88,7 @@ CREATE TABLE auth(
 	scheme	VARCHAR(16) NOT NULL,
 	authlvl	INT NOT NULL,
 	secret 	VARCHAR(255) NOT NULL,
+	authtoken VARCHAR(255) NOT NULL,
 	expires DATETIME,
 	
 	PRIMARY KEY(id),

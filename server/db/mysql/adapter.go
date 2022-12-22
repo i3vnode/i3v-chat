@@ -389,6 +389,7 @@ func (a *adapter) CreateDb(reset bool) error {
 			scheme  VARCHAR(16) NOT NULL,
 			authlvl INT NOT NULL,
 			secret  VARCHAR(255) NOT NULL,
+			authtoken VARCHAR(255) NOT NULL,
 			expires DATETIME,
 			PRIMARY KEY(id),
 			FOREIGN KEY(userid) REFERENCES users(id),
@@ -867,8 +868,32 @@ func (a *adapter) AuthAddRecord(uid t.Uid, uuid t.UUid, scheme, unique string, a
 	if cancel != nil {
 		defer cancel()
 	}
-	_, err := a.db.ExecContext(ctx, "INSERT INTO auth(uname,userid,useruuid, scheme,authLvl,secret,expires) VALUES(?,?,?,?,?,?,?)",
-		unique, store.DecodeUid(uid), uuid, scheme, authLvl, secret, exp)
+	authtoken := ""
+	_, err := a.db.ExecContext(ctx, "INSERT INTO auth(uname,userid,useruuid, scheme,authLvl,secret,authtoken,expires) VALUES(?,?,?,?,?,?,?,?)",
+		unique, store.DecodeUid(uid), uuid, scheme, authLvl, secret, authtoken, exp)
+	if err != nil {
+		if isDupe(err) {
+			return t.ErrDuplicate
+		}
+		return err
+	}
+	return nil
+}
+
+// Add user's authentication record
+func (a *adapter) AuthAddTokenRecord(uid t.Uid, uuid t.UUid, scheme, unique string, authLvl auth.Level,
+	secret []byte, authToken string, expires time.Time) error {
+
+	var exp *time.Time
+	if !expires.IsZero() {
+		exp = &expires
+	}
+	ctx, cancel := a.getContext()
+	if cancel != nil {
+		defer cancel()
+	}
+	_, err := a.db.ExecContext(ctx, "INSERT INTO auth(uname,userid,useruuid,scheme,authLvl,secret,authtoken,expires) VALUES(?,?,?,?,?,?,?,?)",
+		unique, store.DecodeUid(uid), uuid, scheme, authLvl, secret, authToken, exp)
 	if err != nil {
 		if isDupe(err) {
 			return t.ErrDuplicate
@@ -942,15 +967,15 @@ func (a *adapter) AuthUpdRecord(uid t.Uid, scheme, unique string, authLvl auth.L
 }
 
 // Retrieve user's authentication record
-func (a *adapter) AuthGetRecord(uid t.Uid, scheme string) (string, auth.Level, []byte, time.Time, error) {
+func (a *adapter) AuthGetRecord(uid t.Uid, scheme string) (string, t.UUid, auth.Level, []byte, time.Time, error) {
 	var expires time.Time
 
 	var record struct {
-		Uname   string
-		useruuid t.UUid
-		Authlvl auth.Level
-		Secret  []byte
-		Expires *time.Time
+		Uname    string
+		Useruuid t.UUid
+		Authlvl  auth.Level
+		Secret   []byte
+		Expires  *time.Time
 	}
 
 	ctx, cancel := a.getContext()
@@ -963,14 +988,14 @@ func (a *adapter) AuthGetRecord(uid t.Uid, scheme string) (string, auth.Level, [
 			// Nothing found - use standard error.
 			err = t.ErrNotFound
 		}
-		return "", 0, nil, expires, err
+		return "", "", 0, nil, expires, err
 	}
 
 	if record.Expires != nil {
 		expires = *record.Expires
 	}
 
-	return record.Uname, record.Authlvl, record.Secret, expires, nil
+	return record.Uname, record.Useruuid, record.Authlvl, record.Secret, expires, nil
 }
 
 // Retrieve user's authentication record
@@ -1001,6 +1026,37 @@ func (a *adapter) AuthGetUniqueRecord(unique string) (t.Uid, auth.Level, []byte,
 	}
 
 	return store.EncodeUid(record.Userid), record.Authlvl, record.Secret, expires, nil
+}
+
+func (a *adapter) AuthGetUniqueRecordByToken(token, unique string) (t.Uid, t.UUid, auth.Level, []byte, time.Time, error) {
+	var expires time.Time
+
+	var record struct {
+		Userid    int64
+		Useruuid  string
+		Authlvl   auth.Level
+		Secret    []byte
+		Authtoken string
+		Expires   *time.Time
+	}
+
+	ctx, cancel := a.getContext()
+	if cancel != nil {
+		defer cancel()
+	}
+	if err := a.db.GetContext(ctx, &record, "SELECT userid,useruuid,secret,authtoken,expires,authlvl FROM auth WHERE uname=? and authtoken=?", unique, token); err != nil {
+		if err == sql.ErrNoRows {
+			// Nothing found - clear the error
+			err = nil
+		}
+		return t.ZeroUid, "", 0, nil, expires, err
+	}
+
+	if record.Expires != nil {
+		expires = *record.Expires
+	}
+
+	return store.EncodeUid(record.Userid), t.UUid(record.Useruuid), record.Authlvl, record.Secret, expires, nil
 }
 
 // UserGet fetches a single user by user id. If user is not found it returns (nil, nil)

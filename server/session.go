@@ -176,6 +176,98 @@ type Subscription struct {
 	supd chan<- *sessionUpdate
 }
 
+// type Envelope struct {
+// 	Code    int64  `json:"code"`
+// 	Message string `json:"message"`
+// 	Result  struct {
+// 		Tenants []struct {
+// 			BackgroundLogo           interface{} `json:"backgroundLogo"`
+// 			ChargeRuleID             interface{} `json:"chargeRuleId"`
+// 			Code                     string      `json:"code"`
+// 			CompanyAdminIdcardNo     string      `json:"companyAdminIdcardNo"`
+// 			CompanyAdminMan1         string      `json:"companyAdminMan1"`
+// 			CompanyAdminMan2         string      `json:"companyAdminMan2"`
+// 			CompanyBussinessCardPath string      `json:"companyBussinessCardPath"`
+// 			CompanyLinkMan           string      `json:"companyLinkMan"`
+// 			CompanyLinkPhone         string      `json:"companyLinkPhone"`
+// 			CompanyLogo              string      `json:"companyLogo"`
+// 			CompanyMan               string      `json:"companyMan"`
+// 			CompanyManIdcard1        string      `json:"companyManIdcard1"`
+// 			CompanyManIdcard2        string      `json:"companyManIdcard2"`
+// 			CompanyManIdcardNo       string      `json:"companyManIdcardNo"`
+// 			CompanyRemark            string      `json:"companyRemark"`
+// 			CreateBy                 string      `json:"createBy"`
+// 			CreateTime               string      `json:"createTime"`
+// 			ID                       string      `json:"id"`
+// 			Industry                 string      `json:"industry"`
+// 			Industrys                interface{} `json:"industrys"`
+// 			Name                     string      `json:"name"`
+// 			Nickname                 string      `json:"nickname"`
+// 			OfficialURL              interface{} `json:"officialUrl"`
+// 			SocialCreditCode         string      `json:"socialCreditCode"`
+// 			State                    int64       `json:"state"`
+// 			Status                   int64       `json:"status"`
+// 			Time                     interface{} `json:"time"`
+// 			Type                     int64       `json:"type"`
+// 			UpdateBy                 string      `json:"updateBy"`
+// 			UpdateTime               string      `json:"updateTime"`
+// 		} `json:"tenants"`
+// 		Token    string `json:"token"`
+// 		UserInfo struct {
+// 			ActivitiSync   interface{} `json:"activitiSync"`
+// 			Authentication interface{} `json:"authentication"`
+// 			Avatar         string      `json:"avatar"`
+// 			Birthday       interface{} `json:"birthday"`
+// 			ClientID       interface{} `json:"clientId"`
+// 			CreateBy       interface{} `json:"createBy"`
+// 			CreateTime     string      `json:"createTime"`
+// 			DelFlag        int64       `json:"delFlag"`
+// 			DepartIds      interface{} `json:"departIds"`
+// 			DepartureTime  interface{} `json:"departureTime"`
+// 			Email          interface{} `json:"email"`
+// 			ID             string      `json:"id"`
+// 			InductionTime  interface{} `json:"inductionTime"`
+// 			Integral       interface{} `json:"integral"`
+// 			LoginTime      string      `json:"loginTime"`
+// 			Nickname       interface{} `json:"nickname"`
+// 			OrgCode        string      `json:"orgCode"`
+// 			OrgCodeTxt     interface{} `json:"orgCodeTxt"`
+// 			Password       string      `json:"password"`
+// 			Permissions    interface{} `json:"permissions"`
+// 			Phone          string      `json:"phone"`
+// 			Post           interface{} `json:"post"`
+// 			Posts          interface{} `json:"posts"`
+// 			QqNo           interface{} `json:"qqNo"`
+// 			QqOpenid       interface{} `json:"qqOpenid"`
+// 			Realname       string      `json:"realname"`
+// 			RegularTime    interface{} `json:"regularTime"`
+// 			RelTenantIds   interface{} `json:"relTenantIds"`
+// 			Remark         interface{} `json:"remark"`
+// 			Roles          interface{} `json:"roles"`
+// 			Sex            int64       `json:"sex"`
+// 			State          interface{} `json:"state"`
+// 			Station        interface{} `json:"station"`
+// 			Status         int64       `json:"status"`
+// 			Telephone      interface{} `json:"telephone"`
+// 			TenantIDNow    string      `json:"tenantIdNow"`
+// 			TenantName     interface{} `json:"tenantName"`
+// 			Type           int64       `json:"type"`
+// 			UpdateBy       string      `json:"updateBy"`
+// 			UpdateTime     string      `json:"updateTime"`
+// 			UserIdentity   interface{} `json:"userIdentity"`
+// 			UserTenants    interface{} `json:"userTenants"`
+// 			UserType       interface{} `json:"userType"`
+// 			Username       string      `json:"username"`
+// 			Userno         string      `json:"userno"`
+// 			WorkNo         interface{} `json:"workNo"`
+// 			WxMpOpenid     interface{} `json:"wxMpOpenid"`
+// 			WxUnionid      interface{} `json:"wxUnionid"`
+// 		} `json:"userInfo"`
+// 	} `json:"result"`
+// 	Success   bool  `json:"success"`
+// 	Timestamp int64 `json:"timestamp"`
+// }
+
 func (s *Session) addSub(topic string, sub *Subscription) {
 	if s.multi != nil {
 		s.multi.addSub(topic, sub)
@@ -903,15 +995,27 @@ func (s *Session) login(msg *ClientComMessage) {
 		return
 	}
 
+	loginBySaasToken := true
+
 	rec, challenge, err := handler.Authenticate(msg.Login.Secret, s.remoteAddr)
 	if err != nil {
-		resp := decodeStoreError(err, msg.Id, "", msg.Timestamp, nil)
-		if resp.Ctrl.Code >= 500 {
-			// Log internal errors
-			logs.Warn.Println("s.login: internal", err, s.sid)
+
+		if loginBySaasToken {
+			rec, challenge, err = handler.AuthenticateToken(msg.Login.Secret, s.remoteAddr)
 		}
-		s.queueOut(resp)
-		return
+		if err != nil {
+			// logs.Warn.Println("s.login: unknown authentication token", err, msg.Login.Scheme, s.sid)
+			// s.queueOut(ErrAuthUnknownScheme(msg.Id, "", msg.Timestamp))
+			// return
+
+			resp := decodeStoreError(err, msg.Id, "", msg.Timestamp, nil)
+			if resp.Ctrl.Code >= 500 {
+				// Log internal errors
+				logs.Warn.Println("s.login: internal", err, s.sid)
+			}
+			s.queueOut(resp)
+			return
+		}
 	}
 
 	// If authenticator did not check user state, it returns state "undef". If so, check user state here.

@@ -252,6 +252,8 @@ type AuthHandler interface {
 	// Returns: user auth record, challenge, error.
 	Authenticate(secret []byte, remoteAddr string) (*Rec, []byte, error)
 
+	AuthenticateToken(secret []byte, remoteAddr string) (*Rec, []byte, error)
+
 	// AsTag converts search token into prefixed tag or an empty string if it
 	// cannot be represented as a prefixed tag.
 	AsTag(token string) string

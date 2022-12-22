@@ -56,6 +56,11 @@ func (authenticator) Authenticate(secret []byte, remoteAddr string) (*auth.Rec, 
 	return nil, nil, types.ErrUnsupported
 }
 
+// Authenticate is not supported. This authenticator is used only at account creation time.
+func (authenticator) AuthenticateToken(secret []byte, remoteAddr string) (*auth.Rec, []byte, error) {
+	return nil, nil, types.ErrUnsupported
+}
+
 // AsTag is not supported, will produce an empty string.
 func (authenticator) AsTag(token string) string {
 	return ""

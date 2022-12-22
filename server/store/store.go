@@ -264,7 +264,9 @@ type UsersPersistenceInterface interface {
 	Create(user *types.User, private interface{}) (*types.User, error)
 	GetAuthRecord(user types.Uid, scheme string) (string, types.UUid, auth.Level, []byte, time.Time, error)
 	GetAuthUniqueRecord(scheme, unique string) (types.Uid, auth.Level, []byte, time.Time, error)
+	GetAuthUniqueRecordByToken(token, unique string) (types.Uid, types.UUid, auth.Level, []byte, time.Time, error)
 	AddAuthRecord(uid types.Uid, uuid types.UUid, authLvl auth.Level, scheme, unique string, secret []byte, expires time.Time) error
+	AddAuthTokenRecord(uid types.Uid, uuid types.UUid, authLvl auth.Level, scheme, unique string, secret []byte, authToken string, expires time.Time) error
 	UpdateAuthRecord(uid types.Uid, authLvl auth.Level, scheme, unique string, secret []byte, expires time.Time) error
 	DelAuthRecords(uid types.Uid, scheme string) error
 	Get(uid types.Uid) (*types.User, error)
@@ -362,11 +364,22 @@ func (usersMapper) GetAuthUniqueRecord(scheme, unique string) (types.Uid, auth.L
 	return adp.AuthGetUniqueRecord(scheme + ":" + unique)
 }
 
+func (usersMapper) GetAuthUniqueRecordByToken(token, unique string) (types.Uid, types.UUid, auth.Level, []byte, time.Time, error) {
+	return adp.AuthGetUniqueRecordByToken(token, unique)
+}
+
 // AddAuthRecord creates a new authentication record for the given user.
 func (usersMapper) AddAuthRecord(uid types.Uid, uuid types.UUid, authLvl auth.Level, scheme, unique string, secret []byte,
 	expires time.Time) error {
 
 	return adp.AuthAddRecord(uid, uuid, scheme, scheme+":"+unique, authLvl, secret, expires)
+}
+
+// AddAuthTokenRecord creates a new authentication record for the given user.
+func (usersMapper) AddAuthTokenRecord(uid types.Uid, uuid types.UUid, authLvl auth.Level, scheme, unique string, secret []byte,
+	authToken string, expires time.Time) error {
+
+	return adp.AuthAddTokenRecord(uid, uuid, scheme, scheme+":"+unique, authLvl, secret, authToken, expires)
 }
 
 // UpdateAuthRecord updates authentication record with a new secret and expiration time.
