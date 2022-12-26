@@ -72,7 +72,7 @@ type Envelope struct {
 		DelFlag        int64       `json:"delFlag"`
 		DepartIds      interface{} `json:"departIds"`
 		DepartureTime  interface{} `json:"departureTime"`
-		Email          interface{} `json:"email"`
+		Email          string      `json:"email"`
 		ID             string      `json:"id"`
 		InductionTime  interface{} `json:"inductionTime"`
 		Integral       interface{} `json:"integral"`
@@ -108,8 +108,8 @@ type Envelope struct {
 		Username       string      `json:"username"`
 		Userno         string      `json:"userno"`
 		WorkNo         interface{} `json:"workNo"`
-		WxMpOpenid     interface{} `json:"wxMpOpenid"`
-		WxUnionid      interface{} `json:"wxUnionid"`
+		WxMpOpenid     string      `json:"wxMpOpenid"`
+		WxUnionid      string      `json:"wxUnionid"`
 	} `json:"result"`
 	Success   bool  `json:"success"`
 	Timestamp int64 `json:"timestamp"`
@@ -423,14 +423,14 @@ func (a *authenticator) AuthenticateToken(secret []byte, remoteAddr string) (*au
 		getDefaultAccess(types.TopicCatGrp, false, false)
 
 	strEmail := string(interfaceToBytes(env.Result.Email))
-	if strEmail == "" {
-		strEmail = "null@email.com"
+	if len(strEmail) == 0 || strEmail == "\"\"" {
+		strEmail = env.Result.Username + "@email.com"
 	}
 
 	jbyte := `{"basic":"basic:` + env.Result.Username + `","email":"email:` + strEmail + `", "public":{"fn":"` + env.Result.Username + `"}}`
 	var stu UserEnv
 	if err = json.Unmarshal([]byte(jbyte), &stu); err != nil {
-		logs.Warn.Println("create user: failed to create user public ", err)
+		logs.Warn.Println("create user: failed to create user public ", err, " ,jbyte:", jbyte)
 		return nil, nil, err
 	}
 
