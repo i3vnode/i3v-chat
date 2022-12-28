@@ -93,7 +93,7 @@ CREATE TABLE auth(
 	
 	PRIMARY KEY(id),
 	UNIQUE INDEX auth_userid_authtoken(userid, authtoken),
- 	UNIQUE INDEX auth_userid_scheme_authtoken(userid, scheme, authtoken),
+ 	UNIQUE INDEX auth_userid_schem\e_authtoken(userid, scheme, authtoken),
 	UNIQUE INDEX auth_uname_authtoken (uname, authtoken)
 );
 #
