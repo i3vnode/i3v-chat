@@ -1193,104 +1193,86 @@ meta: {
       updated: "2015-10-24T10:26:09.716Z", // 订阅中最后一次更改的时间戳，仅适用于请求者自己的订阅
       touched: "2017-11-02T09:13:55.530Z", // 主题中最后一条消息的时间戳（也可能包括将来的其他事件，例如新订户
       acs: {  // 用户的访问权限
-        want: "JRWP", // string, requested access permission, present for user's own
-              // subscriptions and when the requester is topic's manager or owner
-        given: "JRWP", // string, granted access permission, optional exactly as 'want'
-        mode: "JRWP" // string, combination of want and given
+        want: "JRWP", // string, 请求的访问权限，当请求者是主题的管理员或所有者时，为用户自己的订阅提供
+        given: "JRWP", // string, 授予访问权限，可选，与'want'完全相同 
+        mode: "JRWP" // string, want和given的组合
       },
-      read: 112, // integer, ID of the message user claims through {note} message
-                 // to have read, optional.
-      recv: 315, // integer, like 'read', but received, optional.
-      clear: 12, // integer, in case some messages were deleted, the greatest ID
-                 // of a deleted message, optional.
-      trusted: { ... }, // application-defined payload assigned by the system
-                        // administration
-      public: { ... }, // application-defined user's 'public' object, absent when
-                       // querying P2P topics.
-      private: { ... } // application-defined user's 'private' object.
-      online: true, // boolean, current online status of the user; if this is a
-                    // group or a p2p topic, it's user's online status in the topic,
-                    // i.e. if the user is attached and listening to messages; if this
-                    // is a response to a 'me' query, it tells if the topic is
-                    // online; p2p is considered online if the other party is
-                    // online, not necessarily attached to topic; a group topic
-                    // is considered online if it has at least one active
-                    // subscriber.
+      read: 112, // integer, 用户通过｛note｝消息声明的消息ID阅读，可选。
+      recv: 315, // integer, 类似'read'，但已接收，可选。
+      clear: 12, // integer, 如果某些消息被删除，则为已删除消息的最大ID，可选。
+      trusted: { ... }, // 由系统管理分配的应用程序定义的负载
+      public: { ... }, // 应用程序定义的用户的'public'对象，在查询P2P主题时不存在。 
+      private: { ... } // 应用程序定义的用户的'private'对象。
+      online: true, // boolean, 用户的当前在线状态；如果这是一个组或一个p2p主题，则表示用户在主题中的在线状态，
+                    //即用户是否已连接并正在收听消息；如果这是对'me'查询的响应，它会告诉主题是否在线；
+                    //如果另一方在线，则p2p被认为是在线的，不一定依附于主题；
+                    //如果组主题具有至少一个活动订户，则该组主题被认为是在线的。
 
-      // The following fields are present only when querying 'me' topic
+      // 以下字段仅在查询'me'主题时出现
 
-      topic: "grp1XUtEhjv6HND", // string, topic this subscription describes
-      seq: 321, // integer, server-issued id of the last {data} message
+      topic: "grp1XUtEhjv6HND", // string, 此订阅描述的主题
+      seq: 321, // integer, 服务器发出的最后一条{data}消息的
 
-      // The following field is present only when querying 'me' topic and the
-      // topic described is a P2P topic
-      seen: { // object, if this is a P2P topic, info on when the peer was last
-              //online
+      // 以下字段仅在查询'me'主题且所描述的主题是P2P主题时出现
+      seen: { // object, 如果这是P2P主题，请提供该节点上次联机的时间信息
         when: "2015-10-24T10:26:09.716Z", // timestamp
-        ua: "Tinode/1.0 (Android 5.1)" // string, user agent of peer's client
+        ua: "Tinode/1.0 (Android 5.1)" // string, 节点客户端的用户代理
       }
     },
     ...
   ],
-  tags: [ // array of tags that the topic or user (in case of "me" topic) is indexed by
+  tags: [ // 主题或用户（如果是"me"主题）索引的标记数组
     "email:alice@example.com", "tel:+1234567890"
   ],
-  cred: [ // array of user's credentials
+  cred: [ // 用户凭据数组
     {
-      meth: "email", // string, validation method
-      val: "alice@example.com", // string, credential value
-      done: true     // validation status
+      meth: "email", // string, 验证方法
+      val: "alice@example.com", // string, 凭据值
+      done: true     // 验证状态
     },
     ...
   ],
   del: {
-    clear: 3, // ID of the latest applicable 'delete' transaction
-    delseq: [{low: 15}, {low: 22, hi: 28}, ...], // ranges of IDs of deleted messages
+    clear: 3, // 最新适用的'delete'事务的ID
+    delseq: [{low: 15}, {low: 22, hi: 28}, ...], // 已删除邮件的ID范围
   }
 }
 ```
 
 #### `{pres}`
 
-Tinode uses `{pres}` message to inform clients of important events. A separate [document](https://docs.google.com/spreadsheets/d/e/2PACX-1vStUDHb7DPrD8tF5eANLu4YIjRkqta8KOhLvcj2precsjqR40eDHvJnnuuS3bw-NcWsP1QKc7GSTYuX/pubhtml?gid=1959642482&single=true) explains all possible use cases.
+Tinode 使用 `{pres}` m消息通知客户端重要事件。一份单独的 [文档](https://docs.google.com/spreadsheets/d/e/2PACX-1vStUDHb7DPrD8tF5eANLu4YIjRkqta8KOhLvcj2precsjqR40eDHvJnnuuS3bw-NcWsP1QKc7GSTYuX/pubhtml?gid=1959642482&single=true) 解释了所有可能的用例。
 
 ```js
 pres: {
-  topic: "me", // string, topic which receives the notification, always present
-  src: "grp1XUtEhjv6HND", // string, topic or user affected by the change, always present
-  what: "on", // string, what's changed, always present
-  seq: 123, // integer, "what" is "msg", a server-issued ID of the message,
-            // optional
-  clear: 15, // integer, "what" is "del", an update to the delete transaction ID.
-  delseq: [{low: 123}, {low: 126, hi: 136}], // array of ranges, "what" is "del",
-             // ranges of IDs of deleted messages, optional
-  ua: "Tinode/1.0 (Android 2.2)", // string, a User Agent string identifying the client
-             // software if "what" is "on" or "ua", optional
-  act: "usr2il9suCbuko",  // string, user who performed the action, optional
-  tgt: "usrRkDVe0PYDOo",  // string, user affected by the action, optional
-  acs: {want: "+AS-D", given: "+S"} // object, changes to access mode, "what" is "acs",
-                          // optional
+  topic: "me", // string, 接收通知的主题，始终存在
+  src: "grp1XUtEhjv6HND", // string, 受更改影响的主题或用户，始终存在
+  what: "on", // string, 更改的内容，始终存在
+  seq: 123, // integer, "what" 是 "msg"，服务器发出的消息ID，可选
+  clear: 15, // integer, "what" 是 "del"，更新删除事务ID。
+  delseq: [{low: 123}, {low: 126, hi: 136}], // 范围数组, "what" 是 "del",
+             // 已删除邮件的ID范围，可选
+  ua: "Tinode/1.0 (Android 2.2)", // string, 如果"what"是"on" 或"ua"，则标识客户端软件的用户代理字符串，可选
+  act: "usr2il9suCbuko",  // string, 执行操作的用户，可选
+  tgt: "usrRkDVe0PYDOo",  // string, 受操作影响的用户，可选
+  acs: {want: "+AS-D", given: "+S"} // object, 更改访问模式，"what"是"acs"，可选
 }
 ```
 
-The `{pres}` messages are purely transient: they are not stored and no attempt is made to deliver them later if the destination is temporarily unavailable.
+`{pres}` 消息纯粹是暂时的：它们不会被存储，如果目的地暂时不可用，也不会尝试稍后传递它们。
 
-Timestamp is not present in `{pres}` messages.
+`{pres}` 消息中不存在时间戳。
 
 
 #### `{info}`
 
-Forwarded client-generated notification `{note}`. Server guarantees that the message complies with this specification and that content of `topic` and `from` fields is correct. The other content is copied from the `{note}` message verbatim and may potentially be incorrect or misleading if the originator  so desires.
+转发的客户端生成的通知`{note}`。服务器保证消息符合此规范，并且`topic` 和`from`字段的内容正确。其他内容是从`{note}`消息中逐字复制的，如果发件人愿意，可能会不正确或误导。
 
 ```js
 info: {
-  topic: "grp1XUtEhjv6HND", // string, topic affected, always present
-  from: "usr2il9suCbuko", // string, id of the user who published the
-                          // message, always present
-  what: "read", // string, one of "kp", "recv", "read", "data", see client-side {note},
-                // always present
-  seq: 123, // integer, ID of the message that client has acknowledged,
-            // guaranteed 0 < read <= recv <= {ctrl.params.seq}; present for recv &
-            // read
+  topic: "grp1XUtEhjv6HND", // string, 主题受影响，始终存在
+  from: "usr2il9suCbuko", // string, 发布消息的用户的id，始终存在
+  what: "read", // string, "kp", "recv", "read", "data", 之一，请参见客户端 {note}, 始终存在
+  seq: 123, // integer, 客户端已确认的消息ID，保证0 < read <= recv <= {ctrl.params.seq}；存在以供recv 和 read
 }
 ```
