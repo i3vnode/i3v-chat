@@ -92,11 +92,13 @@ CREATE TABLE auth(
 	expires DATETIME,
 	
 	PRIMARY KEY(id),
-	FOREIGN KEY(userid) REFERENCES users(id),
-	UNIQUE INDEX auth_userid_scheme(userid, scheme),
-	UNIQUE INDEX auth_uname (uname)
+	UNIQUE INDEX auth_userid_authtoken(userid, authtoken),
+ 	UNIQUE INDEX auth_userid_scheme(userid, scheme),
+	UNIQUE INDEX auth_uname_authtoken (uname, authtoken)
 );
-
+#
+# FOREIGN KEY(userid) REFERENCES users(id),
+# UNIQUE INDEX auth_uname (uname)
 
 # Topics
 CREATE TABLE topics(
@@ -211,6 +213,7 @@ CREATE TABLE credentials(
 	UNIQUE credentials_uniqueness(synthetic),
 	FOREIGN KEY(userid) REFERENCES users(id)
 );
+#	
 
 # Records of uploaded files. Files themselves are stored elsewhere.
 CREATE TABLE fileuploads(

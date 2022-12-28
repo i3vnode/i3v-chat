@@ -71,6 +71,8 @@ type Adapter interface {
 	CredDel(uid t.Uid, method, value string) error
 	// CredConfirm marks given credential as validated.
 	CredConfirm(uid t.Uid, method string) error
+	// Check User Exist
+	CheckUserExist(uname string) (bool, t.Uid, t.UUid, error)
 	// CredFail increments count of failed validation attepmts for the given credentials.
 	CredFail(uid t.Uid, method string) error
 

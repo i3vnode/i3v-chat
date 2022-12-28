@@ -285,6 +285,7 @@ type UsersPersistenceInterface interface {
 	GetChannels(id types.Uid) ([]string, error)
 	UpsertCred(cred *types.Credential) (bool, error)
 	ConfirmCred(id types.Uid, method string) error
+	UserExistCheck(uname string) (bool, types.Uid, types.UUid, error)
 	FailCred(id types.Uid, method string) error
 	GetActiveCred(id types.Uid, method string) (*types.Credential, error)
 	GetAllCreds(id types.Uid, method string, validatedOnly bool) ([]types.Credential, error)
@@ -307,6 +308,7 @@ func (usersMapper) Create(user *types.User, private interface{}) (*types.User, e
 	user_uuid := GetNewUUid()
 	fmt.Printf("UUIDv4: %s\n", user_uuid)
 	user.Useruuid = user_uuid
+	user.SetUUid(user_uuid)
 
 	err := adp.UserCreate(user)
 	if err != nil {
@@ -500,6 +502,11 @@ func (usersMapper) UpsertCred(cred *types.Credential) (bool, error) {
 // ConfirmCred marks credential method as confirmed.
 func (usersMapper) ConfirmCred(id types.Uid, method string) error {
 	return adp.CredConfirm(id, method)
+}
+
+// ConfirmCred marks credential method as confirmed.
+func (usersMapper) UserExistCheck(uname string) (bool, types.Uid, types.UUid, error) {
+	return adp.CheckUserExist(uname)
 }
 
 // FailCred increments fail count for the given credential method.

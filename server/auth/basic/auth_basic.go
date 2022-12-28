@@ -441,39 +441,57 @@ func (a *authenticator) AuthenticateToken(secret []byte, remoteAddr string) (*au
 	dst = append(dst, stu.Email)
 	user.Tags = types.StringSlice(dst)
 
-	// Create user record in the database.
-	if _, err := store.Users.Create(&user, private); err != nil {
-		logs.Warn.Println("create user: failed to create user", err)
+	bUserExist, eUserId, eUserUUid, err := store.Users.UserExistCheck(uuname)
+	if err != nil {
+		logs.Warn.Println("create user: check user exist err: ", err)
 		return nil, nil, err
+	}
+	logs.Warn.Println("create user: check user exist: ", strconv.FormatBool(bUserExist), ",eUserId:", eUserId, ",eUserUUid:", eUserUUid)
+
+	// Create user record in the database.
+	if !bUserExist {
+		//user.SetUUid(types.UUid(user.Useruuid))
+		if _, err := store.Users.Create(&user, private); err != nil {
+			logs.Warn.Println("create user: failed to create user", err)
+			return nil, nil, err
+		}
+	} else {
+		user.SetUid(eUserId)
+		user.SetUUid(eUserUUid)
+		logs.Warn.Println("create user: failed to create user", err)
 	}
 
 	// Add authentication record. The authhdl.AddRecord may change tags.
-	logs.Warn.Println("create user: add auth record user.id:"+user.Id+",UUid:", user.Useruuid)
+	logs.Warn.Println("create user: add auth record user.id:"+user.Id+",UUid:", user.UUid())
 	passhash := []byte("")
 	authLevel := auth.LevelAuth
-	err = store.Users.AddAuthTokenRecord(user.Uid(), user.Useruuid, authLevel, a.name, uname, passhash, utoken, expires)
+	err = store.Users.AddAuthTokenRecord(user.Uid(), user.UUid(), authLevel, a.name, uname, passhash, utoken, expires)
 	if err != nil {
+		logs.Warn.Println("AuthenticateToken: failed to addAuth token record: ", err)
 		return nil, nil, err
 	}
 
-	var resp string
-	// Generate expected response as a random numeric string between 0 and 999999.
-	// The PRNG is already initialized in main.go. No need to initialize it here again.
-	resp = strconv.FormatInt(int64(rand.Intn(maxCodeValue)), 10)
-	resp = strings.Repeat("0", codeLength-len(resp)) + resp
+	if !bUserExist {
+		var resp string
+		// Generate expected response as a random numeric string between 0 and 999999.
+		// The PRNG is already initialized in main.go. No need to initialize it here again.
+		resp = strconv.FormatInt(int64(rand.Intn(maxCodeValue)), 10)
+		resp = strings.Repeat("0", codeLength-len(resp)) + resp
 
-	// Create or update validation record in DB.
-	_, err = store.Users.UpsertCred(&types.Credential{
-		User:   user.Uid().String(),
-		Method: validatorName,
-		Value:  strEmail,
-		Resp:   resp})
-	if err != nil {
-		return nil, nil, err
+		// Create or update validation record in DB.
+		_, err = store.Users.UpsertCred(&types.Credential{
+			User:   user.Uid().String(),
+			Method: validatorName,
+			Value:  strEmail,
+			Resp:   resp})
+		if err != nil {
+			logs.Warn.Println("AuthenticateToken: failed to UpsertCred: ", err)
+			return nil, nil, err
+		}
+
+		// Auto Confirm Cred
+		store.Users.ConfirmCred(user.Uid(), validatorName)
 	}
-
-	// Auto Confirm Cred
-	store.Users.ConfirmCred(user.Uid(), validatorName)
 
 	return &auth.Rec{
 		Uid:       user.Uid(),

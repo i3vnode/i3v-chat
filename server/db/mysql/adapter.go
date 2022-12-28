@@ -2441,6 +2441,47 @@ func (a *adapter) FindUsers(uid t.Uid, req [][]string, opt []string) ([]t.Subscr
 
 }
 
+func (a *adapter) CheckUserExist(uname string) (bool, t.Uid, t.UUid, error) {
+	query := "SELECT u.id, u.useruuid, u.createdat,u.updatedat,u.access,u.public,u.trusted,u.tags,COUNT(*) AS matches " +
+		"FROM users AS u LEFT JOIN usertags AS t ON t.userid=u.id " +
+		"WHERE u.state=? AND t.tag = ? " +
+		"GROUP BY u.id,u.useruuid,u.createdat,u.updatedat,u.access,u.public,u.trusted,u.tags "
+
+	args := []interface{}{0, uname}
+
+	ctx, cancel := a.getContext()
+	if cancel != nil {
+		defer cancel()
+	}
+
+	// Get users matched by tags, sort by number of matches from high to low.
+	rows, err := a.db.QueryxContext(ctx, query, args...)
+
+	if err != nil {
+		return false, t.ZeroUid, "", err
+	}
+
+	var userId int64
+	var userUuid string
+	var public, trusted interface{}
+	var access t.DefaultAccess
+	var userTags t.StringSlice
+	var ignored int
+	var sub t.Subscription
+	// var subs []t.Subscription
+	// thisUser := store.DecodeUid(uid)
+	for rows.Next() {
+		if err = rows.Scan(&userId, &userUuid, &sub.CreatedAt, &sub.UpdatedAt, &access,
+			&public, &trusted, &userTags, &ignored); err != nil {
+			//subs = nil
+			break
+		}
+		return true, store.EncodeUid(userId), t.UUid(userUuid), nil
+	}
+
+	return false, t.ZeroUid, "", nil
+}
+
 // Returns a list of topics with matching tags.
 // Searching the 'topics.Tags' for the given tags using respective index.
 func (a *adapter) FindTopics(req [][]string, opt []string) ([]t.Subscription, error) {
